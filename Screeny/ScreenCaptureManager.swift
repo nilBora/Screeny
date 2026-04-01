@@ -42,22 +42,18 @@ class ScreenCaptureManager {
         }
     }
 
-    @available(macOS 14.0, *)
     private func screenshotWithSCKit(rect: CGRect) async throws -> CGImage {
         let content = try await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true)
 
-        // Match the display that contains the capture rect
         let mainScreenID = NSScreen.main?
             .deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? CGDirectDisplayID
-        let display = content.displays.first { $0.displayID == mainScreenID }
-            ?? content.displays[0]
+        let display = content.displays.first { $0.displayID == mainScreenID } ?? content.displays[0]
 
         let scaleFactor = NSScreen.main?.backingScaleFactor ?? 2.0
-
         let filter = SCContentFilter(display: display, excludingWindows: [])
 
         let config = SCStreamConfiguration()
-        config.sourceRect = rect           // top-left origin, in points
+        config.sourceRect = rect
         config.width  = Int(rect.width  * scaleFactor)
         config.height = Int(rect.height * scaleFactor)
         config.scalesToFit = false
@@ -78,7 +74,7 @@ class ScreenCaptureManager {
     private func showPermissionAlert() {
         let alert = NSAlert()
         alert.messageText = "Screen Recording Permission Required"
-        alert.informativeText = "Please grant Screeny access in System Settings → Privacy & Security → Screen Recording."
+        alert.informativeText = "Enable Screeny in System Settings → Privacy & Security → Screen & System Audio Recording, then relaunch the app."
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Open System Settings")
         alert.addButton(withTitle: "Cancel")
