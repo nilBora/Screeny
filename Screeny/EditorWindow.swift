@@ -61,8 +61,8 @@ class EditorWindow: NSWindow {
     }
 
     override func makeFirstResponder(_ responder: NSResponder?) -> Bool {
-        // Keep canvas as first responder unless a text field is active
-        if responder is NSTextField {
+        // NSTextField uses NSText as its internal field editor — allow both through
+        if responder is NSTextField || responder is NSText {
             return super.makeFirstResponder(responder)
         }
         return super.makeFirstResponder(canvas)
