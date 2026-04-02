@@ -149,46 +149,56 @@ struct ToolbarView: View {
     ]
 
     var body: some View {
-        HStack(spacing: 8) {
-            toolButton(icon: "textformat.abc", tool: .text)
-            toolButton(icon: "rectangle", tool: .rectangle)
-            toolButton(icon: "arrow.up.right", tool: .arrow)
+        HStack(spacing: 6) {
+            // — Інструменти —
+            toolButton(icon: "rectangle",              tool: .rectangle)
+            toolButton(icon: "arrow.up.right",         tool: .arrow)
+            toolButton(icon: "textformat.abc",         tool: .text)
+            toolButton(icon: "rectangle.fill",         tool: .fill,     help: "Fill (замазати кольором)")
+            toolButton(icon: "square.grid.3x3.fill",   tool: .pixelate, help: "Blur (пікселізація)")
 
             Divider().frame(height: 22)
 
+            // — Товщина лінії —
+            ForEach(0..<3) { i in
+                let sizes: [CGFloat] = [1.5, 3, 5.5]
+                let size = sizes[i]
+                Button { viewModel.selectedLineWidthIndex = i } label: {
+                    RoundedRectangle(cornerRadius: size / 2)
+                        .frame(width: 18, height: size)
+                        .foregroundStyle(viewModel.selectedLineWidthIndex == i ? Color.accentColor : Color.primary.opacity(0.5))
+                }
+                .buttonStyle(.borderless)
+                .help("Line weight \(i + 1)")
+            }
+
+            Divider().frame(height: 22)
+
+            // — Кольори —
             ForEach(presetColors.indices, id: \.self) { i in
-                let (nsColor, swColor) = presetColors[i]
+                let (_, swColor) = presetColors[i]
                 Circle()
                     .fill(swColor)
-                    .frame(width: 18, height: 18)
-                    .overlay(
-                        Circle()
-                            .stroke(viewModel.selectedColorIndex == i ? Color.primary : Color.clear, lineWidth: 2)
-                            .padding(-2)
-                    )
-                    .onTapGesture { viewModel.selectedColorIndex = i }
+                    .frame(width: 16, height: 16)
+                    .overlay(Circle()
+                        .stroke(viewModel.selectedColorIndex == i ? Color.primary : Color.clear, lineWidth: 2)
+                        .padding(-2))
                     .shadow(radius: 1)
+                    .onTapGesture { viewModel.selectedColorIndex = i }
             }
 
             Divider().frame(height: 22)
 
             Spacer()
 
-            Button(action: { sendKey("z", modifiers: .command) }) {
-                Image(systemName: "arrow.uturn.backward")
-            }
-            .buttonStyle(.borderless)
-            .help("Undo (⌘Z)")
+            Button { sendAction("z") } label: { Image(systemName: "arrow.uturn.backward") }
+                .buttonStyle(.borderless).help("Undo (⌘Z)")
 
-            Button("Save") { sendKey("s", modifiers: .command) }
-                .buttonStyle(.borderless)
-                .keyboardShortcut("s", modifiers: .command)
-                .help("Save (⌘S)")
+            Button("Save") { sendAction("s") }
+                .buttonStyle(.borderless).help("Save (⌘S)")
 
-            Button("Copy") { sendKey("c", modifiers: .command) }
-                .buttonStyle(.bordered)
-                .keyboardShortcut("c", modifiers: .command)
-                .help("Copy to Clipboard (⌘C)")
+            Button("Copy") { sendAction("c") }
+                .buttonStyle(.bordered).help("Copy (⌘C)")
         }
         .padding(.horizontal, 12)
         .frame(height: 52)
@@ -196,33 +206,34 @@ struct ToolbarView: View {
     }
 
     @ViewBuilder
-    private func toolButton(icon: String, tool: AnnotationTool) -> some View {
-        Button {
-            viewModel.selectedTool = tool
-        } label: {
+    private func toolButton(icon: String, tool: AnnotationTool, help: String? = nil) -> some View {
+        Button { viewModel.selectedTool = tool } label: {
             Image(systemName: icon)
                 .frame(width: 28, height: 28)
                 .background(viewModel.selectedTool == tool ? Color.accentColor.opacity(0.2) : Color.clear)
                 .cornerRadius(6)
         }
         .buttonStyle(.borderless)
-        .help(toolHelp(tool))
+        .help(help ?? defaultHelp(tool))
     }
 
-    private func toolHelp(_ tool: AnnotationTool) -> String {
+    private func defaultHelp(_ tool: AnnotationTool) -> String {
         switch tool {
-        case .text: return "Text (T)"
-        case .rectangle: return "Rectangle (R)"
-        case .arrow: return "Arrow (A)"
+        case .rectangle: return "Rectangle"
+        case .arrow:     return "Arrow"
+        case .text:      return "Text"
+        case .fill:      return "Fill (замазати кольором)"
+        case .pixelate:  return "Blur (пікселізація)"
         }
     }
 
-    private func sendKey(_ key: String, modifiers: EventModifiers) {
-        // SwiftUI buttons in NSHostingView can't directly trigger NSWindow actions,
-        // so we post a keyboard event to the main window's canvas.
+    private func sendAction(_ key: String) {
         guard let window = NSApp.windows.first(where: { $0 is EditorWindow }) as? EditorWindow else { return }
-        if key == "z" { (window.contentView?.subviews.compactMap { $0 as? AnnotationCanvas }.first)?.undo() }
-        if key == "c" { window.copyToClipboard() }
-        if key == "s" { window.saveToFile() }
+        switch key {
+        case "z": window.contentView?.subviews.compactMap { $0 as? AnnotationCanvas }.first?.undo()
+        case "c": window.copyToClipboard()
+        case "s": window.saveToFile()
+        default: break
+        }
     }
 }
