@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.app
+
+      - name: Build
+        run: |
+          xcodebuild \
+            -project Screeny.xcodeproj \
+            -scheme Screeny \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Create DMG
+        run: |
+          brew install create-dmg
+          create-dmg \
+            --volname "Screeny" \
+            --window-size 540 380 \
+            --icon-size 128 \
+            --icon "Screeny.app" 140 180 \
+            --app-drop-link 400 180 \
+            "Screeny-${{ github.ref_name }}.dmg" \
+            "build/Build/Products/Release/Screeny.app"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Screeny ${{ github.ref_name }}"
+          body: |
+            ## Screeny ${{ github.ref_name }}
+
+            Minimal macOS menu bar app for instant screenshot capture and annotation.
+
+            **Features**
+            - Area capture with crosshair overlay (`Ctrl+Shift+4`)
+            - Annotation tools: rectangle, arrow, text, fill, pixelate
+            - Line thickness presets and 6-color picker
+            - Undo (`Cmd+Z`)
+            - Copy to clipboard (`Cmd+C`) or save as PNG/JPEG (`Cmd+S`)
+            - Lives in the menu bar — no Dock icon
+
+            **Requirements**
+            - macOS 14.0 (Sonoma) or later
+            - Screen Recording permission
+
+            > **Note:** The app is not notarized. On first launch right-click → Open to bypass Gatekeeper.
+          files: "Screeny-${{ github.ref_name }}.dmg"
