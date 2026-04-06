@@ -197,6 +197,16 @@ class AnnotationCanvas: NSView, NSTextFieldDelegate {
         activeTextField = field
     }
 
+    func commitTextFieldIfNeeded() {
+        commitActiveTextField()
+    }
+
+    var activeTextFieldHasSelection: Bool {
+        guard let field = activeTextField,
+              let editor = field.currentEditor() else { return false }
+        return editor.selectedRange.length > 0
+    }
+
     private func commitActiveTextField() {
         guard let field = activeTextField else { return }
         if !field.stringValue.isEmpty {

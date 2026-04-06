@@ -68,6 +68,33 @@ class EditorWindow: NSWindow {
         return super.makeFirstResponder(canvas)
     }
 
+    // MARK: - Key Equivalents
+
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        guard event.modifierFlags.contains(.command) else {
+            return super.performKeyEquivalent(with: event)
+        }
+        switch event.charactersIgnoringModifiers {
+        case "c":
+            if canvas.activeTextFieldHasSelection {
+                return super.performKeyEquivalent(with: event)
+            }
+            canvas.commitTextFieldIfNeeded()
+            copyToClipboard()
+            return true
+        case "s":
+            canvas.commitTextFieldIfNeeded()
+            saveToFile()
+            return true
+        case "z":
+            canvas.commitTextFieldIfNeeded()
+            canvas.undo()
+            return true
+        default:
+            return super.performKeyEquivalent(with: event)
+        }
+    }
+
     // MARK: - Export
 
     func copyToClipboard() {
