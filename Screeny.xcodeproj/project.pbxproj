@@ -16,7 +16,27 @@
 		BF000007 /* EditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000007 /* EditorViewModel.swift */; };
 		BF000008 /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000008 /* Annotation.swift */; };
 		BF000009 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000011 /* Assets.xcassets */; };
+		BF000010 /* EditorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002 /* EditorViewModelTests.swift */; };
+		BF000011 /* AnnotationCanvasTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000003 /* AnnotationCanvasTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B1000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E2000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E1000001;
+			remoteInfo = Screeny;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXTargetDependency section */
+		B1000002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E1000001 /* Screeny */;
+			targetProxy = B1000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXFileReference section */
 		A1000001 /* ScreenyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenyApp.swift; sourceTree = "<group>"; };
@@ -31,6 +51,9 @@
 		A100000A /* Screeny.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Screeny.entitlements; sourceTree = "<group>"; };
 		A1000010 /* Screeny.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Screeny.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000011 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1000012 /* ScreenyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScreenyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A2000002 /* EditorViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorViewModelTests.swift; sourceTree = "<group>"; };
+		A2000003 /* AnnotationCanvasTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationCanvasTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +71,7 @@
 			isa = PBXGroup;
 			children = (
 				D1000002 /* Screeny */,
+				D2000001 /* ScreenyTests */,
 				D1000001 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -56,8 +80,18 @@
 			isa = PBXGroup;
 			children = (
 				A1000010 /* Screeny.app */,
+				A1000012 /* ScreenyTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D2000001 /* ScreenyTests */ = {
+			isa = PBXGroup;
+			children = (
+				A2000002 /* EditorViewModelTests.swift */,
+				A2000003 /* AnnotationCanvasTests.swift */,
+			);
+			path = ScreenyTests;
 			sourceTree = "<group>";
 		};
 		D1000002 /* Screeny */ = {
@@ -99,6 +133,23 @@
 			productReference = A1000010 /* Screeny.app */;
 			productType = "com.apple.product-type.application";
 		};
+		E2000002 /* ScreenyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F1000003 /* Build configuration list for PBXNativeTarget "ScreenyTests" */;
+			buildPhases = (
+				C2000001 /* Sources */,
+				C2000002 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B1000002 /* PBXTargetDependency */,
+			);
+			name = ScreenyTests;
+			productName = ScreenyTests;
+			productReference = A1000012 /* ScreenyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -128,6 +179,7 @@
 			projectRoot = "";
 			targets = (
 				E1000001 /* Screeny */,
+				E2000002 /* ScreenyTests */,
 			);
 		};
 /* End PBXProject section */
@@ -142,6 +194,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase (Tests) section */
+		C2000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF000010 /* EditorViewModelTests.swift in Sources */,
+				BF000011 /* AnnotationCanvasTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase (Tests) section */
+
+/* Begin PBXFrameworksBuildPhase (Tests) section */
+		C2000002 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase (Tests) section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		C1000004 /* Copy to Applications */ = {
@@ -326,6 +400,34 @@
 			};
 			name = Release;
 		};
+		F3000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.screeny.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Screeny.app/Contents/MacOS/Screeny";
+			};
+			name = Debug;
+		};
+		F3000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.screeny.app.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Screeny.app/Contents/MacOS/Screeny";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -343,6 +445,15 @@
 			buildConfigurations = (
 				F2000003 /* Debug */,
 				F2000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F1000003 /* Build configuration list for PBXNativeTarget "ScreenyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F3000001 /* Debug */,
+				F3000002 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
