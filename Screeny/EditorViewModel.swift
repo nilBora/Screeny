@@ -6,9 +6,14 @@ class EditorViewModel: ObservableObject {
     @Published var selectedColorIndex: Int = 0
     @Published var selectedLineWidthIndex: Int = 1
 
+    // Order must match ToolbarView.presetColors
     let presetColors: [NSColor] = [
-        .systemRed, .systemBlue, .systemGreen,
-        .systemYellow, .systemOrange, .white
+        .systemRed,
+        .systemOrange,
+        .systemYellow,
+        .systemGreen,
+        .systemBlue,
+        .white,
     ]
     let lineWidths: [CGFloat] = [1.5, 3.0, 6.0]
 

@@ -15,8 +15,15 @@ Screeny/
   AnnotationCanvas.swift   — NSView handling drawing, mouse events, text input
   EditorViewModel.swift    — ObservableObject shared between canvas and toolbar
   Annotation.swift         — Annotation enum (rectangle, arrow, text, fill, pixelate)
+  Assets.xcassets/         — AppIcon (all macOS sizes 16–1024px)
   Info.plist               — LSUIElement=true, NSScreenCaptureUsageDescription
   Screeny.entitlements     — app-sandbox=false
+ScreenyTests/
+  EditorViewModelTests.swift  — Unit tests for EditorViewModel
+  AnnotationCanvasTests.swift — Unit tests for AnnotationCanvas
+.github/workflows/
+  release.yml              — CI: builds app, creates DMG, publishes GitHub release on tag push
+Makefile                   — make build / make dmg / make clean
 ```
 
 ## Key Architecture Decisions
@@ -26,6 +33,7 @@ Screeny/
 - **Carbon hotkeys**: RegisterEventHotKey for global Ctrl+Shift+4 (avoids conflicts with system Cmd+Shift+4)
 - **Coordinate systems**: SelectionOverlayWindow converts NSView bottom-left coords to CG top-left coords before passing to SCScreenshotManager.sourceRect
 - **TCC Permission issue**: Screen recording permission is tied to binary code signature. App must be code-signed (Xcode → Signing & Capabilities → Team) and run from /Applications for permission to persist across builds. Build phase auto-copies to /Applications after each build.
+- **performKeyEquivalent override**: EditorWindow intercepts Cmd+C/S/Z at window level to handle shortcuts regardless of first responder. Cmd+C copies screenshot unless text is selected in the active NSTextField (in which case native copy is used).
 
 ## Tools
 | Tool | Annotation Type | Notes |
@@ -37,11 +45,16 @@ Screeny/
 | Pixelate | `.pixelate(rect)` | CIPixellate filter on screenshot crop |
 
 ## Export
-- **Cmd+C**: `AnnotationCanvas.flattenToImage()` → NSPasteboard (TIFF)
+- **Cmd+C**: `AnnotationCanvas.flattenToImage()` → NSPasteboard (TIFF). If text field is active with a selection, copies text instead.
 - **Cmd+S**: NSSavePanel → PNG or JPEG
+
+## Release
+- Tag `v*` on main triggers `.github/workflows/release.yml` — builds with `xcodebuild`, creates DMG via `hdiutil`, publishes GitHub release
+- Local: `make dmg VERSION=1.0.1` → `Screeny-1.0.1.dmg`
 
 ## Known Issues / Gotchas
 - Text field focus: EditorWindow.makeFirstResponder must pass through both NSTextField AND NSText (field editor), otherwise the text tool is unresponsive
 - SCScreenshotManager requires macOS 14.0+
 - Permission won't persist without proper code signing — run `tccutil reset ScreenCapture com.screeny.app` after signing setup
 - Build phase "Copy to Applications" copies .app to /Applications after every build for stable permission binding
+- GitHub Actions build uses `CODE_SIGNING_REQUIRED=NO` — released DMG is unsigned, users must right-click → Open to bypass Gatekeeper
