@@ -150,12 +150,13 @@ class EditorWindow: NSWindow {
             container.animator().alphaValue = 1
         }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             NSAnimationContext.runAnimationGroup { ctx in
                 ctx.duration = 0.25
                 container.animator().alphaValue = 0
-            } completionHandler: {
+            } completionHandler: { [weak self] in
                 container.removeFromSuperview()
+                self?.close()
             }
         }
     }
