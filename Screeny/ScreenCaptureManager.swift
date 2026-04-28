@@ -7,6 +7,8 @@ class ScreenCaptureManager {
     private var overlayWindow: SelectionOverlayWindow?
     private var editorWindow: EditorWindow?
 
+    private var hasRequestedScreenRecordingPermission = false
+
     private init() {}
 
     // MARK: - Public
@@ -14,6 +16,8 @@ class ScreenCaptureManager {
     func startCapture() {
         editorWindow?.close()
         editorWindow = nil
+
+        guard checkScreenRecordingPermission() else { return }
 
         let overlay = SelectionOverlayWindow()
         overlay.onCapture = { [weak self] cgRect in
@@ -23,6 +27,19 @@ class ScreenCaptureManager {
         overlayWindow = overlay
         overlay.show()
         overlay.makeFirstResponder(overlay.contentView)
+    }
+
+    // MARK: - Permission
+
+    private func checkScreenRecordingPermission() -> Bool {
+        if CGPreflightScreenCaptureAccess() { return true }
+        if !hasRequestedScreenRecordingPermission {
+            hasRequestedScreenRecordingPermission = true
+            CGRequestScreenCaptureAccess()
+            return false
+        }
+        showPermissionAlert()
+        return false
     }
 
     // MARK: - Capture
@@ -37,7 +54,7 @@ class ScreenCaptureManager {
                     self.openEditor(with: screenshot)
                 }
             } catch {
-                await MainActor.run { self.showPermissionAlert() }
+                print("Screeny: capture error: \(error)")
             }
         }
     }
