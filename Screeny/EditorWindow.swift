@@ -4,14 +4,12 @@ import SwiftUI
 class EditorWindow: NSWindow {
     private let viewModel = EditorViewModel()
     private let canvas: AnnotationCanvas
-    private let toolbarHosting: NSHostingView<ToolbarView>
     static let toolbarHeight: CGFloat = 60
+    static let minToolbarWidth: CGFloat = 720
 
     init(screenshot: NSImage) {
         canvas = AnnotationCanvas()
         canvas.screenshot = screenshot
-
-        toolbarHosting = NSHostingView(rootView: ToolbarView(viewModel: EditorViewModel()))
 
         let screenFrame = NSScreen.main?.visibleFrame ?? CGRect(x: 0, y: 0, width: 1440, height: 900)
         let imageSize = screenshot.size
@@ -19,8 +17,10 @@ class EditorWindow: NSWindow {
         let maxH = screenFrame.height - 80
 
         let scale = min(maxW / imageSize.width, maxH / imageSize.height, 1.0)
-        let windowW = imageSize.width * scale
-        let windowH = imageSize.height * scale + EditorWindow.toolbarHeight
+        let imageDisplayW = imageSize.width * scale
+        let imageDisplayH = imageSize.height * scale
+        let windowW = max(imageDisplayW, EditorWindow.minToolbarWidth)
+        let windowH = imageDisplayH + EditorWindow.toolbarHeight
 
         let x = (screenFrame.width - windowW) / 2 + screenFrame.minX
         let y = (screenFrame.height - windowH) / 2 + screenFrame.minY
@@ -36,20 +36,24 @@ class EditorWindow: NSWindow {
         titlebarAppearsTransparent = true
         isMovableByWindowBackground = false
         isReleasedWhenClosed = false
+        contentMinSize = NSSize(width: EditorWindow.minToolbarWidth, height: EditorWindow.toolbarHeight + 120)
 
-        setupViews(windowWidth: windowW, windowHeight: windowH, imageHeight: windowH - EditorWindow.toolbarHeight)
+        setupViews(windowWidth: windowW, windowHeight: windowH, imageDisplayWidth: imageDisplayW, imageHeight: imageDisplayH)
     }
 
-    private func setupViews(windowWidth: CGFloat, windowHeight: CGFloat, imageHeight: CGFloat) {
+    private func setupViews(windowWidth: CGFloat, windowHeight: CGFloat, imageDisplayWidth: CGFloat, imageHeight: CGFloat) {
         canvas.viewModel = viewModel
 
         let toolbarSwiftUI = ToolbarView(viewModel: viewModel)
         let hosting = NSHostingView(rootView: toolbarSwiftUI)
 
         let contentView = NSView(frame: CGRect(x: 0, y: 0, width: windowWidth, height: windowHeight))
+        contentView.wantsLayer = true
+        contentView.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
 
-        canvas.frame = CGRect(x: 0, y: EditorWindow.toolbarHeight, width: windowWidth, height: imageHeight)
-        canvas.autoresizingMask = [.width, .height]
+        let canvasX = (windowWidth - imageDisplayWidth) / 2
+        canvas.frame = CGRect(x: canvasX, y: EditorWindow.toolbarHeight, width: imageDisplayWidth, height: imageHeight)
+        canvas.autoresizingMask = [.minXMargin, .maxXMargin, .height]
 
         hosting.frame = CGRect(x: 0, y: 0, width: windowWidth, height: EditorWindow.toolbarHeight)
         hosting.autoresizingMask = [.width]

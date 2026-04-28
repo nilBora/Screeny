@@ -23,7 +23,7 @@ ScreenyTests/
   AnnotationCanvasTests.swift — Unit tests for AnnotationCanvas
 .github/workflows/
   release.yml              — CI: builds app, creates DMG, publishes GitHub release on tag push
-Makefile                   — make build / make dmg / make clean
+Makefile                   — make build / make installer / make clean
 ```
 
 ## Key Architecture Decisions
@@ -44,17 +44,25 @@ Makefile                   — make build / make dmg / make clean
 | Fill | `.fill(rect, color)` | Solid color fill for censoring |
 | Pixelate | `.pixelate(rect)` | CIPixellate filter on screenshot crop |
 
+## Toolbar (ToolbarView)
+- Height: 60px, `.ultraThinMaterial` background
+- Hover states on all buttons (`@State private var hovered*`)
+- Color order: Red, Orange, Yellow, Green, Blue, White (must match `EditorViewModel.presetColors`)
+- Tool icons: rectangle, arrow.up.right, character.cursor.ibeam, rectangle.fill, aqi.medium
+
 ## Export
-- **Cmd+C**: `AnnotationCanvas.flattenToImage()` → NSPasteboard (TIFF). If text field is active with a selection, copies text instead.
+- **Cmd+C**: `AnnotationCanvas.flattenToImage()` → NSPasteboard (TIFF). If text field has selection, native copy is used instead.
 - **Cmd+S**: NSSavePanel → PNG or JPEG
+- After copy: animated "Copied to clipboard" toast, then window closes after 1s fade-out
 
 ## Release
+- `make installer VERSION=x.x.x` — builds app + creates drag-to-Applications DMG via `create-dmg`
 - Tag `v*` on main triggers `.github/workflows/release.yml` — builds with `xcodebuild`, creates DMG via `hdiutil`, publishes GitHub release
-- Local: `make dmg VERSION=1.0.1` → `Screeny-1.0.1.dmg`
+- GitHub Actions build uses `CODE_SIGNING_REQUIRED=NO` — unsigned DMG, users must right-click → Open to bypass Gatekeeper
 
 ## Known Issues / Gotchas
 - Text field focus: EditorWindow.makeFirstResponder must pass through both NSTextField AND NSText (field editor), otherwise the text tool is unresponsive
 - SCScreenshotManager requires macOS 14.0+
 - Permission won't persist without proper code signing — run `tccutil reset ScreenCapture com.screeny.app` after signing setup
 - Build phase "Copy to Applications" copies .app to /Applications after every build for stable permission binding
-- GitHub Actions build uses `CODE_SIGNING_REQUIRED=NO` — released DMG is unsigned, users must right-click → Open to bypass Gatekeeper
+- `xcode-select` must point to Xcode.app, not CommandLineTools: `sudo xcode-select -s /Applications/Xcode.app`
