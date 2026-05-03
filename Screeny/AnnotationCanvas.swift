@@ -231,10 +231,10 @@ class AnnotationCanvas: NSView, NSTextFieldDelegate {
 
     override func keyDown(with event: NSEvent) {
         if event.modifierFlags.contains(.command) {
-            switch event.charactersIgnoringModifiers {
-            case "z": undo()
-            case "c": (window as? EditorWindow)?.copyToClipboard()
-            case "s": (window as? EditorWindow)?.saveToFile()
+            switch event.keyCode {
+            case KeyCode.z: undo()
+            case KeyCode.c: (window as? EditorWindow)?.copyToClipboard()
+            case KeyCode.s: (window as? EditorWindow)?.saveToFile()
             default: super.keyDown(with: event)
             }
         } else if event.keyCode == 53 { // Esc
@@ -243,4 +243,12 @@ class AnnotationCanvas: NSView, NSTextFieldDelegate {
             super.keyDown(with: event)
         }
     }
+}
+
+// MARK: - Key Codes (layout-independent virtual key codes)
+
+private enum KeyCode {
+    static let c: UInt16 = 8
+    static let s: UInt16 = 1
+    static let z: UInt16 = 6
 }

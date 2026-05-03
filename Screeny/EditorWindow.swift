@@ -76,19 +76,19 @@ class EditorWindow: NSWindow {
         guard event.modifierFlags.contains(.command) else {
             return super.performKeyEquivalent(with: event)
         }
-        switch event.charactersIgnoringModifiers {
-        case "c":
+        switch event.keyCode {
+        case KeyCode.c:
             if canvas.activeTextFieldHasSelection {
                 return super.performKeyEquivalent(with: event)
             }
             canvas.commitTextFieldIfNeeded()
             copyToClipboard()
             return true
-        case "s":
+        case KeyCode.s:
             canvas.commitTextFieldIfNeeded()
             saveToFile()
             return true
-        case "z":
+        case KeyCode.z:
             canvas.commitTextFieldIfNeeded()
             canvas.undo()
             return true
@@ -164,6 +164,14 @@ class EditorWindow: NSWindow {
             }
         }
     }
+}
+
+// MARK: - Key Codes (layout-independent virtual key codes)
+
+private enum KeyCode {
+    static let c: UInt16 = 8
+    static let s: UInt16 = 1
+    static let z: UInt16 = 6
 }
 
 // MARK: - NSImage Save Helper
