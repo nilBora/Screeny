@@ -13,8 +13,8 @@ git clone --depth=1 \
   "$TAP_DIR"
 
 mkdir -p "$TAP_DIR/Casks"
-cat > "$TAP_DIR/Casks/Screeny.rb" <<EOF
-cask "Screeny" do
+cat > "$TAP_DIR/Casks/screeny.rb" <<EOF
+cask "screeny" do
   version "${VERSION}"
   sha256 "${SHA256}"
 
@@ -34,8 +34,8 @@ cask "Screeny" do
   end
 
   zap trash: [
-    "~/Library/Preferences/com.Screeny.app.plist",
-    "~/Library/Caches/com.Screeny.app",
+    "~/Library/Preferences/com.screeny.app.plist",
+    "~/Library/Caches/com.screeny.app",
   ]
 end
 EOF
@@ -43,6 +43,7 @@ EOF
 cd "$TAP_DIR"
 git config user.name "github-actions[bot]"
 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-git add Casks/Screeny.rb
+git rm -f Casks/Screeny.rb 2>/dev/null || true
+git add Casks/screeny.rb
 git commit -m "Screeny ${VERSION}"
 git push origin HEAD
