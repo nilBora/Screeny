@@ -1,64 +1,52 @@
-name: Release
+name: release
 
 on:
   push:
     tags:
       - "v*"
 
-jobs:
-  build:
-    runs-on: macos-14
+permissions:
+  contents: write
 
+jobs:
+  release:
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.app
+        run: sudo xcode-select -s /Applications/Xcode.app
 
-      - name: Build
-        run: |
-          xcodebuild \
-            -project Screeny.xcodeproj \
-            -scheme Screeny \
-            -configuration Release \
-            -derivedDataPath build \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+      - name: Install create-dmg
+        run: brew install create-dmg
 
-      - name: Create DMG
+      - name: Resolve version from tag
+        id: v
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Bump version in Info.plist + pbxproj
+        run: bash scripts/bump-version.sh "${{ steps.v.outputs.version }}"
+
+      - name: Build DMG
+        run: make installer VERSION="${{ steps.v.outputs.version }}"
+
+      - name: Compute SHA256
+        id: sha
         run: |
-          brew install create-dmg
-          create-dmg \
-            --volname "Screeny" \
-            --window-size 540 380 \
-            --icon-size 128 \
-            --icon "Screeny.app" 140 180 \
-            --app-drop-link 400 180 \
-            "Screeny-${{ github.ref_name }}.dmg" \
-            "build/Build/Products/Release/Screeny.app"
+          SHA=$(shasum -a 256 "Screeny-${{ steps.v.outputs.version }}.dmg" | awk '{print $1}')
+          echo "sha256=$SHA" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "Screeny ${{ github.ref_name }}"
-          body: |
-            ## Screeny ${{ github.ref_name }}
+          files: Screeny-${{ steps.v.outputs.version }}.dmg
+          generate_release_notes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-            Minimal macOS menu bar app for instant screenshot capture and annotation.
-
-            **Features**
-            - Area capture with crosshair overlay (`Ctrl+Shift+4`)
-            - Annotation tools: rectangle, arrow, text, fill, pixelate
-            - Line thickness presets and 6-color picker
-            - Undo (`Cmd+Z`)
-            - Copy to clipboard (`Cmd+C`) or save as PNG/JPEG (`Cmd+S`)
-            - Lives in the menu bar — no Dock icon
-
-            **Requirements**
-            - macOS 14.0 (Sonoma) or later
-            - Screen Recording permission
-
-            > **Note:** The app is not notarized. On first launch right-click → Open to bypass Gatekeeper.
-          files: "Screeny-${{ github.ref_name }}.dmg"
+      - name: Update Homebrew Cask in nilBora/homebrew-apps
+        env:
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+          VERSION: ${{ steps.v.outputs.version }}
+          SHA256: ${{ steps.sha.outputs.sha256 }}
+        run: bash scripts/update-cask.sh
