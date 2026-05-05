@@ -21,13 +21,32 @@ A minimal macOS menu bar app for instant screenshot capture and annotation.
 - **Undo** — `Cmd+Z`
 - **Menu bar app** — no Dock icon, lives quietly in the menu bar
 
+## Install
+
+### Homebrew (recommended)
+
+```bash
+brew tap nilbora/apps
+brew install --cask screeny
+```
+
+Grant Screen Recording permission on first launch:
+
+> **System Settings → Privacy & Security → Screen & System Audio Recording** → enable Screeny
+
+### Manual
+
+Download the latest DMG from [Releases](https://github.com/nilBora/Screeny/releases), drag `Screeny.app` to `/Applications`, and grant Screen Recording permission as above.
+
+---
+
 ## Requirements
 
-- macOS 14.0 (Sonoma) or later
-- Xcode 15 or later (to build)
+- macOS 13.0 (Ventura) or later
+- Xcode 15 or later (to build from source)
 - Screen Recording permission
 
-## Getting Started
+## Build from Source
 
 ### 1. Build
 
@@ -39,18 +58,12 @@ Before the first build, set up code signing to ensure screen recording permissio
 
 Then build with `Cmd+B`. The build phase automatically copies `Screeny.app` to `/Applications`.
 
-### 2. Grant Permission
-
-Launch `/Applications/Screeny.app` and go to:
-
-> **System Settings → Privacy & Security → Screen & System Audio Recording** → enable Screeny
-
-If you need to reset a stale permission entry:
+Grant Screen Recording permission as described in the Install section above. To reset a stale entry:
 ```bash
 tccutil reset ScreenCapture com.screeny.app
 ```
 
-### 3. Use
+### 2. Use
 
 | Action | Shortcut |
 |--------|----------|
