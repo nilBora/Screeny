@@ -12,8 +12,16 @@ git clone --depth=1 \
   "https://x-access-token:${HOMEBREW_TAP_GITHUB_TOKEN}@github.com/nilBora/homebrew-apps.git" \
   "$TAP_DIR"
 
-mkdir -p "$TAP_DIR/Casks"
-cat > "$TAP_DIR/Casks/screeny.rb" <<EOF
+cd "$TAP_DIR"
+git config user.name "github-actions[bot]"
+git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+# Remove the old uppercase file first (same inode on case-insensitive FS),
+# then write the new file so git rm doesn't delete what we just wrote.
+git rm -f Casks/Screeny.rb 2>/dev/null || true
+
+mkdir -p Casks
+cat > "Casks/screeny.rb" <<EOF
 cask "screeny" do
   version "${VERSION}"
   sha256 "${SHA256}"
@@ -40,10 +48,6 @@ cask "screeny" do
 end
 EOF
 
-cd "$TAP_DIR"
-git config user.name "github-actions[bot]"
-git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-git rm -f Casks/Screeny.rb 2>/dev/null || true
 git add Casks/screeny.rb
 git commit -m "Screeny ${VERSION}"
 git push origin HEAD
