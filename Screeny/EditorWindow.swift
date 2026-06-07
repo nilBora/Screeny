@@ -1,4 +1,5 @@
 import AppKit
+import PDFKit
 import SwiftUI
 
 class EditorWindow: NSWindow {
@@ -109,7 +110,10 @@ class EditorWindow: NSWindow {
 
     func saveToFile() {
         let panel = NSSavePanel()
-        panel.allowedContentTypes = [.png, .jpeg]
+        // Order the selected format first — NSSavePanel pre-selects the first content type.
+        let defaultFormat = viewModel.selectedSaveFormat
+        let ordered = [defaultFormat] + SaveFormat.allCases.filter { $0 != defaultFormat }
+        panel.allowedContentTypes = ordered.map(\.utType)
         panel.nameFieldStringValue = "screenshot-\(Int(Date().timeIntervalSince1970))"
         panel.beginSheetModal(for: self) { [weak self] response in
             guard response == .OK, let url = panel.url, let self else { return }
@@ -178,16 +182,29 @@ private enum KeyCode {
 
 private extension NSImage {
     func save(to url: URL) {
+        let ext = url.pathExtension.lowercased()
+
+        if ext == "pdf" {
+            saveAsPDF(to: url)
+            return
+        }
+
         guard let tiffData = tiffRepresentation,
               let bitmap = NSBitmapImageRep(data: tiffData) else { return }
 
-        let ext = url.pathExtension.lowercased()
         let fileType: NSBitmapImageRep.FileType = ext == "jpg" || ext == "jpeg" ? .jpeg : .png
         let props: [NSBitmapImageRep.PropertyKey: Any] = fileType == .jpeg ? [.compressionFactor: 0.9] : [:]
 
         if let data = bitmap.representation(using: fileType, properties: props) {
             try? data.write(to: url)
         }
+    }
+
+    private func saveAsPDF(to url: URL) {
+        guard let page = PDFPage(image: self) else { return }
+        let doc = PDFDocument()
+        doc.insert(page, at: 0)
+        doc.write(to: url)
     }
 }
 
@@ -222,6 +239,8 @@ struct ToolbarView: View {
             colorsGroup
             separator
             Spacer()
+            formatPickerGroup
+            separator
             actionsGroup
         }
         .padding(.horizontal, 12)
@@ -244,6 +263,20 @@ struct ToolbarView: View {
             toolButton(icon: "rectangle.fill",       tool: .fill,      help: "Fill / Redact")
             toolButton(icon: "aqi.medium",           tool: .pixelate,  help: "Blur / Pixelate")
         }
+    }
+
+    // MARK: - Format Picker
+
+    private var formatPickerGroup: some View {
+        Picker("", selection: $viewModel.selectedSaveFormat) {
+            ForEach(SaveFormat.allCases, id: \.self) { format in
+                Text(format.displayName).tag(format)
+            }
+        }
+        .labelsHidden()
+        .pickerStyle(.menu)
+        .frame(width: 84)
+        .help("Save format")
     }
 
     @ViewBuilder

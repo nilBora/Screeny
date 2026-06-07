@@ -15,6 +15,8 @@
 		BF000006 /* AnnotationCanvas.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000006 /* AnnotationCanvas.swift */; };
 		BF000007 /* EditorViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000007 /* EditorViewModel.swift */; };
 		BF000008 /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000008 /* Annotation.swift */; };
+		BF000012 /* SaveFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000013 /* SaveFormat.swift */; };
+		BF000013 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000014 /* SettingsView.swift */; };
 		BF000009 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000011 /* Assets.xcassets */; };
 		BF000010 /* EditorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002 /* EditorViewModelTests.swift */; };
 		BF000011 /* AnnotationCanvasTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000003 /* AnnotationCanvasTests.swift */; };
@@ -47,6 +49,8 @@
 		A1000006 /* AnnotationCanvas.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationCanvas.swift; sourceTree = "<group>"; };
 		A1000007 /* EditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorViewModel.swift; sourceTree = "<group>"; };
 		A1000008 /* Annotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
+		A1000013 /* SaveFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveFormat.swift; sourceTree = "<group>"; };
+		A1000014 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A1000009 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A100000A /* Screeny.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Screeny.entitlements; sourceTree = "<group>"; };
 		A1000010 /* Screeny.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Screeny.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -105,6 +109,8 @@
 				A1000006 /* AnnotationCanvas.swift */,
 				A1000007 /* EditorViewModel.swift */,
 				A1000008 /* Annotation.swift */,
+				A1000013 /* SaveFormat.swift */,
+				A1000014 /* SettingsView.swift */,
 				A1000009 /* Info.plist */,
 				A100000A /* Screeny.entitlements */,
 				A1000011 /* Assets.xcassets */,
@@ -253,6 +259,8 @@
 				BF000006 /* AnnotationCanvas.swift in Sources */,
 				BF000007 /* EditorViewModel.swift in Sources */,
 				BF000008 /* Annotation.swift in Sources */,
+				BF000012 /* SaveFormat.swift in Sources */,
+				BF000013 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
