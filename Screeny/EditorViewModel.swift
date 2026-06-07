@@ -5,6 +5,7 @@ class EditorViewModel: ObservableObject {
     @Published var selectedTool: AnnotationTool = .rectangle
     @Published var selectedColorIndex: Int = 0
     @Published var selectedLineWidthIndex: Int = 1
+    @Published var selectedSaveFormat: SaveFormat = AppSettings.defaultSaveFormat
 
     // Order must match ToolbarView.presetColors
     let presetColors: [NSColor] = [
